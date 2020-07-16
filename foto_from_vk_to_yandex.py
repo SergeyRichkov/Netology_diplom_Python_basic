@@ -24,7 +24,7 @@ with open('response.txt', encoding='utf8') as f:
 
 items_list = response_json['response']['items']
 
-sizes_tuple = ('w', 'z', 'y', 'x', 'r', 'q', 'p', 'm', 'o', 's')
+sizes_tuple = ('w', 'z', 'y', 'x', 'r', 'q', 'p', 'o', 'm', 's')
 
 
 size_list_itog = []
@@ -48,30 +48,25 @@ json_file = []
 for photo1 in items_list:   
     how_many_likes = photo1['likes']['count']   
     photo_type = size_list_itog[items_list.index(photo1)]['type']
-    load_date = photo1['date']
+    load_date = time.gmtime(photo1['date'])
     if like_list.count(how_many_likes) > 1:
-        json_file.append({'file_name' : f'{how_many_likes}' + '.jpeg' + f'/{time.ctime(load_date)}', 'size' : photo_type})
+        json_file.append({'file_name' : f"{how_many_likes}" + '.jpeg' + f"__{time.strftime('%Hh%Mm %d%b %Y', load_date).replace(' ', '_')}", 'size' : photo_type})
     else:
-        json_file.append({'file_name' : f'{how_many_likes}' + '.jpeg', 'size' : photo_type})
+        json_file.append({'file_name' : f"{how_many_likes}" + '.jpeg', 'size' : photo_type})
 
 data1 = json_file
 with open('json_file.json', 'w') as f:
     json.dump(data1, f, ensure_ascii=False, indent=2)
         
 
+print(len(size_list_itog))
 
-    
-
-
-
-        
 param = {'path': 'disk:/from_VK_photo', 'overwrite' : True }
 header = {'Authorization':'AgAAAABC-feRAADLW4D33gzr_E7Uj9e3uLtiL24',}
 create_folder = requests.put(
             'https://cloud-api.yandex.net:443/v1/disk/resources',
             params=param,
             headers=header)
-
 print(create_folder.text)
     
 for element in range(len(size_list_itog)):
