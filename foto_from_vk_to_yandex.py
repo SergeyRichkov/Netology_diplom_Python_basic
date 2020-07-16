@@ -28,7 +28,10 @@ sizes_tuple = ('w', 'z', 'y', 'x', 'r', 'q', 'p', 'm', 'o', 's')
 
 
 size_list_itog = []
+like_list = []
+
 for photo in items_list:
+    like_list.append(photo['likes']['count'])    
     sizes_list_sorted = []
     number = items_list.index(photo)
     for i in sizes_tuple:
@@ -36,30 +39,52 @@ for photo in items_list:
             if i in items_list[number]['sizes'][photo_type_dict]['type']:
                 sizes_list_sorted.append(items_list[number]['sizes'][photo_type_dict])
     size_list_itog.append(sizes_list_sorted[0])
-
-
+  
+              
                 
-                
-            
 
-like_list = []
 
 json_file = []
-for photo1 in items_list:
-    
+for photo1 in items_list:   
     how_many_likes = photo1['likes']['count']   
     photo_type = size_list_itog[items_list.index(photo1)]['type']
     load_date = photo1['date']
-    like_list.append(how_many_likes)
     if like_list.count(how_many_likes) > 1:
         json_file.append({'file_name' : f'{how_many_likes}' + '.jpeg' + f'/{time.ctime(load_date)}', 'size' : photo_type})
     else:
         json_file.append({'file_name' : f'{how_many_likes}' + '.jpeg', 'size' : photo_type})
-print(json_file)
+
+data1 = json_file
+with open('json_file.json', 'w') as f:
+    json.dump(data1, f, ensure_ascii=False, indent=2)
         
+
+
     
+
+
+
+        
+param = {'path': 'disk:/from_VK_photo', 'overwrite' : True }
+header = {'Authorization':'AgAAAABC-feRAADLW4D33gzr_E7Uj9e3uLtiL24',}
+create_folder = requests.put(
+            'https://cloud-api.yandex.net:443/v1/disk/resources',
+            params=param,
+            headers=header)
+
+print(create_folder.text)
     
+for element in range(len(size_list_itog)):
+    param1 = {'path': f"disk:/from_VK_photo/{json_file[element]['file_name']}",
+              'url' : f"{size_list_itog[element]['url']}"}
+   
+    put_photo = requests.post(
+            'https://cloud-api.yandex.net:443/v1/disk/resources/upload',
+            params=param1,
+            headers=header)
     
+    print(put_photo.text)
+
 
     
     
