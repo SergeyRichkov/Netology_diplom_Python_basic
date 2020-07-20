@@ -3,8 +3,6 @@ import json
 import time
 from tqdm import tqdm
 
-##token = 'AgAAAABC-feRAADLW4D33gzr_E7Uj9e3uLtiL24'
-
 class YaUploader:
 
     def __init__(self, vk_id, token):
@@ -14,8 +12,7 @@ class YaUploader:
     def get_id(self):
         try:        
             params = {'user_ids': self.vk_id,
-            'access_token': ('958eb5d439726565e9333aa30e50e0f937ee432e'
-                      '927f0dbd541c541887d919a7c56f95c04217915c32008'),
+            'access_token': '',
             'v':'5.89'
               }
             response = requests.get('https://api.vk.com/method/users.get',
@@ -32,8 +29,7 @@ class YaUploader:
               'album_id': 'profile',
               'extended' : 1,
               'photo_sizes': 1,
-              'access_token': ('958eb5d439726565e9333aa30e50e0f937ee432e927f'
-                               '0dbd541c541887d919a7c56f95c04217915c32008'),
+              'access_token': '',
               'v':'5.89'
               }
             response = requests.get('https://api.vk.com/method/photos.get',
@@ -84,58 +80,48 @@ class YaUploader:
         except KeyError:
            return response.json()['error']
 
-    def enter_number_photos(self, number_of_photos = 5):        
-        def upload_to_ya_disk(self, how_many_photos):
-            try:
-                param = {'path': 'disk:/from_VK_photo',
+    def enter_number_photos(self, number_of_photos = 5):
+        
+        def upload_to_ya_disk(self, how_many_photos):          
+            param = {'path': 'disk:/from_VK_photo',
                          'overwrite' : False}
-                header = {'Authorization': self.token}
-                create_folder = requests.put(
+            header = {'Authorization': self.token}
+            create_folder = requests.put(
                         'https://cloud-api.yandex.net:443/v1/disk/resources',
                             params=param,
                             headers=header)
                     
-                for element in tqdm(range(how_many_photos)):
-                    param = {'path':
+            for element in tqdm(range(how_many_photos)):
+                param = {'path':
 f"disk:/from_VK_photo/{self.get_photo_information()[0][element]['file_name']}",
 'url' : f"{self.get_photo_information()[1][element]['url']}"}
                    
-                    put_photo = requests.post(
+                put_photo = requests.post(
                             'https://'
                     'cloud-api.yandex.net:443/v1/disk/resources/upload',
                             params=param,
                             headers=header)
-                    time.sleep(1)
+                time.sleep(0.5)
                     
-                    if str(put_photo) != '<Response [202]>':
-                        if str(put_photo) == '<Response [401]>':
-                            print('Не удалось авторизоваться.'
+                if str(put_photo) != '<Response [202]>':
+                    if str(put_photo) == '<Response [401]>':
+                        print('Не удалось авторизоваться.'
                                   'Проверьте корректность токена.')
-                            return 
-                        else:
-                            print(put_photo.json()['message'])
-                            return   
-                    
-                return print('Фотографии успешно загружены!')            
-                               
-            except KeyError:
-                if self.get_photo_information()['error_code'] == 30:
-                    print('Профиль является приватным\n'
-                    'Информация, запрашиваемая о профиле,'
-                    'недоступна с используемым ключом доступа')
-                elif self.get_photo_information()['error_code'] == 100:
-                    print('Вероятно,'
-                          'введен некорректный идентификатор пользователя.'
-                          'Проверьте его правильность.')
-                else:
-                    print(self.get_photo_information()['error_msg'])
-                return
+                        return 
+                    else:
+                        print(put_photo.json()['message'])
+                        return
+            print('Фотографии успешно загружены!')                     
+            return            
+
         try:            
             if number_of_photos > len(self.get_photo_information()[0]):
                 number_of_photos = len(self.get_photo_information()[0])
                 upload_to_ya_disk(self, number_of_photos)
+                return
             else:
                 upload_to_ya_disk(self, number_of_photos)
+                return
         except KeyError:
             if self.get_photo_information()['error_code'] == 30:
                 print('Профиль является приватным\n'
@@ -145,6 +131,8 @@ f"disk:/from_VK_photo/{self.get_photo_information()[0][element]['file_name']}",
                 print('Вероятно,'
                         'введен некорректный идентификатор пользователя.'
                           'Проверьте его правильность.')
+            else:
+                print(self.get_photo_information()['error_msg'])
         return                
        
 if __name__ == '__main__':
@@ -153,4 +141,4 @@ if __name__ == '__main__':
     token = input('Введите токен пользователя Яндекс.Диск:\n')
     
     uploader = YaUploader(ID, token)
-    result = uploader.enter_number_photos()          
+    result = uploader.enter_number_photos()
