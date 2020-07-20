@@ -36,7 +36,8 @@ class YaUploader:
                                '0dbd541c541887d919a7c56f95c04217915c32008'),
               'v':'5.89'
               }
-            response = requests.get('https://api.vk.com/method/photos.get', params = params)
+            response = requests.get('https://api.vk.com/method/photos.get',
+                                    params = params)
             items_list = response.json()['response']['items']
 
             sizes_tuple = ('w', 'z', 'y', 'x', 'r', 'q', 'p', 'o', 'm', 's')
@@ -50,9 +51,12 @@ class YaUploader:
                 sizes_list_sorted = []
                 number = items_list.index(photo)
                 for i in sizes_tuple:
-                    for photo_type_dict in range(len(items_list[number]['sizes'])):
-                        if i in items_list[number]['sizes'][photo_type_dict]['type']:
-                            sizes_list_sorted.append(items_list[number]['sizes'][photo_type_dict])
+                    for photo_type_dict in range(
+                        len(items_list[number]['sizes'])):
+                        if i in (items_list[number]['sizes'][photo_type_dict]
+                        ['type']):
+                            (sizes_list_sorted.append(items_list[number]['sizes']
+                            [photo_type_dict]))
                 size_list_final.append(sizes_list_sorted[0])
                                       
         
@@ -61,9 +65,12 @@ class YaUploader:
                 photo_type = size_list_final[items_list.index(photo1)]['type']
                 load_date = time.gmtime(photo1['date'])
                 if like_list.count(how_many_likes) > 1:
-                    json_file.append({'file_name' : f"{how_many_likes}" + '.jpeg' + f"__{time.strftime('%Hh%Mm %d%b %Y', load_date).replace(' ', '_')}", 'size' : photo_type})
+                    json_file.append({'file_name': f"{how_many_likes}" + '.jpeg'
++ f"__{time.strftime('%Hh%Mm %d%b %Y', load_date).replace(' ', '_')}",
+'size' : photo_type})
                 else:
-                    json_file.append({'file_name' : f"{how_many_likes}" + '.jpeg', 'size' : photo_type})
+                    json_file.append({'file_name': f"{how_many_likes}" +
+                                      '.jpeg', 'size' : photo_type})
 
             data1 = json_file
             with open('json_file.json', 'w') as f:
@@ -89,28 +96,32 @@ class YaUploader:
                         headers=header)
                 
             for element in tqdm(range(how_many_photos)):
-                param = {'path': f"disk:/from_VK_photo/{self.get_photo_information()[0][element]['file_name']}",
+                param = {'path':
+f"disk:/from_VK_photo/{self.get_photo_information()[0][element]['file_name']}",
                 'url' : f"{self.get_photo_information()[1][element]['url']}"}
                
                 put_photo = requests.post(
-                        'https://cloud-api.yandex.net:443/v1/disk/resources/upload',
+                        'https://'
+                        'cloud-api.yandex.net:443/v1/disk/resources/upload',
                         params=param,
                         headers=header)
                 if str(put_photo) != '<Response [202]>':
                     if str(put_photo) == '<Response [401]>':
-                        print('Не удалось авторизоваться. Проверьте корректность токена.')
+                        print('Не удалось авторизоваться.'
+                              'Проверьте корректность токена.')
                     else:
                         print(put_photo.json()['message'])
                     break
             time.sleep(1)
-            return
+            return print('Фотографии успешно загружены!')
         except KeyError:
             if self.get_photo_information()['error_code'] == 30:
                 print('Профиль является приватным\n'
                 'Информация, запрашиваемая о профиле,'
                 'недоступна с используемым ключом доступа')
             elif self.get_photo_information()['error_code'] == 100:
-                print('Вероятно, введен некорректный идентификатор пользователя.'
+                print('Вероятно,'
+                      'введен некорректный идентификатор пользователя.'
                       'Проверьте его правильность.')
             else:
                 print(self.get_photo_information()['error_msg'])
@@ -118,11 +129,12 @@ class YaUploader:
         
        
 if __name__ == '__main__':
-    ID = input('Введите идентификаторы пользователя или короткое имя(screen_name):\n')
+    ID = input('Введите идентификаторы пользователя или'
+               'короткое имя(screen_name):\n')
     token = input('Введите токен пользователя Яндекс.Диск:\n')
     
     uploader = YaUploader(ID, token)
-    result = uploader.upload_to_ya_disk(3)
+    result = uploader.upload_to_ya_disk(5)
 
 
 
