@@ -1,12 +1,9 @@
 import requests
 import json
 import time
-from tqdm import tqdm, trange
+from tqdm import tqdm
 
-##token = ''AgAAAABC-feRAADLW4D33gzr_E7Uj9e3uLtiL24''
-
-##with open('response.txt', 'w') as f:
-##    json.dump(data, f, ensure_ascii=False, indent=2)
+##token = 'AgAAAABC-feRAADLW4D33gzr_E7Uj9e3uLtiL24'
 
 class YaUploader:
 
@@ -78,7 +75,7 @@ class YaUploader:
                 
             return  (json_file,size_list_final, like_list)
         except KeyError:
-            return response.json()['error']['error_msg']
+           return response.json()['error']
     
 
     def upload_to_ya_disk(self, how_many_photos = 2):
@@ -100,11 +97,24 @@ class YaUploader:
                         params=param,
                         headers=header)
                 if str(put_photo) != '<Response [202]>':
-                    print(put_photo.json()['message'])
+                    if str(put_photo) == '<Response [401]>':
+                        print('Не удалось авторизоваться. Проверьте корректность токена.')
+                    else:
+                        print(put_photo.json()['message'])
+                    break
             time.sleep(1)
             return
-        except TypeError:
-            return print(self.get_photo_information())
+        except KeyError:
+            if self.get_photo_information()['error_code'] == 30:
+                print('Профиль является приватным\n'
+                'Информация, запрашиваемая о профиле,'
+                'недоступна с используемым ключом доступа')
+            elif self.get_photo_information()['error_code'] == 100:
+                print('Вероятно, введен некорректный идентификатор пользователя.'
+                      'Проверьте его правильность.')
+            else:
+                print(self.get_photo_information()['error_msg'])
+            return 
         
        
 if __name__ == '__main__':
@@ -112,7 +122,7 @@ if __name__ == '__main__':
     token = input('Введите токен пользователя Яндекс.Диск:\n')
     
     uploader = YaUploader(ID, token)
-    result = uploader.upload_to_ya_disk(1)
+    result = uploader.upload_to_ya_disk(3)
 
 
 
