@@ -12,7 +12,7 @@ class YaUploader:
     def get_id(self):
         try:
             params = {'user_ids': self.vk_id,
-            'access_token': '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008',
+            'access_token': '',
             'v':'5.89'
               }
             response = requests.get('https://api.vk.com/method/users.get',
@@ -29,7 +29,7 @@ class YaUploader:
               'album_id': 'profile',
               'extended' : 1,
               'photo_sizes': 1,
-              'access_token': '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008',
+              'access_token': '',
               'v':'5.89'
               }
             response = requests.get('https://api.vk.com/method/photos.get',
@@ -50,8 +50,8 @@ class YaUploader:
                         len(items_list[number]['sizes'])):
                         if i in (items_list[number]['sizes'][photo_type_dict]
                         ['type']):
-                            (sizes_list_sorted.append(items_list[number]['sizes']
-                            [photo_type_dict]))
+                            (sizes_list_sorted.append(items_list[number]
+                            ['sizes'][photo_type_dict]))
                 size_list_final.append(sizes_list_sorted[0])
 
             for photo1 in items_list:
@@ -78,7 +78,6 @@ class YaUploader:
         except KeyError:
            return response.json()['error']
 
-
     def upload_to_ya_disk(self, how_many_photos):
         param = {'path': 'disk:/from_VK_photo',
                      'overwrite' : False}
@@ -93,13 +92,12 @@ class YaUploader:
             param = {'path':
                     f"disk:/from_VK_photo/{info[0][element]['file_name']}",
                     'url' : f"{info[1][element]['url']}"}
-
             put_photo = requests.post(
                         'https://'
                 'cloud-api.yandex.net:443/v1/disk/resources/upload',
                         params=param,
                         headers=header)
-            time.sleep(2)
+            time.sleep(0.5)
 
             if put_photo.status_code != 202:
                 if put_photo.status_code == 401:
